@@ -98,7 +98,6 @@ class InputParser():
         elif len(self._end_hub_str) < 1:
             raise ValueError("Missing value for end zones.")
 
-
     def _extract_components(self, raw_str: str, data_type: str = "zone"):
         # print(raw_str)
         # sample raw str
@@ -108,7 +107,7 @@ class InputParser():
             # check if metadata given
             if '[' in raw_str:
                 essential_str, metadata_str = raw_str.split(' [', 1)
-                metadata_str = metadata_str.rstrip(']')
+                metadata_str = metadata_str.rstrip(']').strip()
             else:
                 essential_str = raw_str
                 metadata_str = ""
@@ -129,23 +128,24 @@ class InputParser():
             # process metadata part
             metadata = {}
             if metadata_str:
-                metadata_str = metadata_str.rstrip(']').strip()
+                for mdata in metadata_str.split(' '):
+                    if '=' not in mdata:
+                        raise ValueError(
+                            "Metadata must be in format '[<key>=<value ...]'")
 
-                if ' ' in metadata_str:
-                    for mdata in metadata_str.split(' '):
-                        key, val = mdata.split('=', 2)
-                        metadata[key] = val
+                    key, val = mdata.split('=', 2)
 
-                else:
-                    key, val = metadata_str.split('=', 2)
+                    if key not in self._VALID_METADATA_KEYS:
+                        raise ValueError(
+                            f"Invalid metadata key passed -> '{key}'")
                     metadata[key] = val
 
             print()
             print(
                 f" essential '{essential_list}'    +   metadata '{metadata}'")
-            
+
             return (essential_list, metadata)
-        
+
         elif data_type == "connection":
             edge_one, edge_two = raw_str.split('-', 1)
             if '-' in edge_two:
