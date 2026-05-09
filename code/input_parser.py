@@ -13,10 +13,22 @@ class InputParser():
         self._all_hubs_str = []
         self._all_connections_str = []
 
+    def __str__(self):
+        return (
+            f"Filename \t\t: '{self._filename}'\n"
+            f"Number of Drones \t\t: '{self._nb_drones}'\n"
+            f"Start Hub Data \t\t: '{self._start_hub_str}'\n"
+            f"End Hub Data \t\t: '{self._end_hub_str}'\n"
+            f"Hubs Data \t\t: '{self._all_hubs_str}'\n"
+            f"Connections Data \t\t: '{self._all_connections_str}'\n"
+        )
+
     def parse_file(self) -> None:
         with open(self._filename, 'r') as file:
             for line_num, line in enumerate(file, start=1):
                 self._process_data_line(line_num, line)
+
+        self._validate_mandatory()
 
     def _process_data_line(self, line_num: int, line: str) -> None:
         line = line.strip()
@@ -57,16 +69,20 @@ class InputParser():
                 f"nb_drones must have an integer value. Value passed in -> '{value}'")
 
     def _set_start_hub(self, value: str) -> None:
-        self._start_hub_str.append(value)
+        extracted_val = self._extract_components(value)
+        self._start_hub_str.append(extracted_val)
 
     def _set_end_hub(self, value: str) -> None:
-        self._end_hub_str.append(value)
+        extracted_val = self._extract_components(value)
+        self._end_hub_str.append(extracted_val)
 
     def _set_connection(self, value: str) -> None:
-        self._all_connections_str.append(value)
+        extracted_val = self._extract_components(value, "connection")
+        self._all_connections_str.append(extracted_val)
 
     def _set_hub(self, value: str) -> None:
-        self._all_hubs_str.append(value)
+        extracted_val = self._extract_components(value)
+        self._all_hubs_str.append(extracted_val)
 
     def _validate_mandatory(self):
         if self._nb_drones == -1:
@@ -82,16 +98,60 @@ class InputParser():
         elif len(self._end_hub_str) < 1:
             raise ValueError("Missing value for end zones.")
 
-        elif len(self._all_connections_str) < (len(self._all_hubs_str) + 2 - 1):
-            raise ValueError(
-                "Too few connections provided. Minimum of n-1 connections required where n is the number of zones to be used.")
 
-    def __str__(self):
-        return (
-            f"Filename \t\t: '{self._filename}'\n"
-            f"Number of Drones \t\t: '{self._nb_drones}'\n"
-            f"Start Hub Data \t\t: '{self._start_hub_str}'\n"
-            f"End Hub Data \t\t: '{self._end_hub_str}'\n"
-            f"Hubs Data \t\t: '{self._all_hubs_str}'\n"
-            f"Connections Data \t\t: '{self._all_connections_str}'\n"
-        )
+    def _extract_components(self, raw_str: str, data_type: str = "zone"):
+        # print(raw_str)
+        # sample raw str
+        # 'start 0 0 [color=green]'
+
+        if data_type == "zone":
+            # check if metadata given
+            if '[' in raw_str:
+                essential_str, metadata_str = raw_str.split(' [', 1)
+                metadata_str = metadata_str.rstrip(']')
+            else:
+                essential_str = raw_str
+                metadata_str = ""
+
+            # process essential values for zones
+            essential = essential_str.split(' ')
+            if len(essential) != 3:
+                raise ValueError(
+                    "Zones must be declared in the format '<hub_type>: <name> <x_coord> <y_coord> [<metadata_key>=<metadata_value> ...]'")
+            try:
+                x_coord = int(essential[1])
+                y_coord = int(essential[2])
+            except ValueError:
+                raise ValueError(
+                    f"X,Y Coordinates must be a valid integer value. Invalid values provided : {essential[1]}, {essential[2]}")
+            essential_list = [essential[0], x_coord, y_coord]
+
+            # process metadata part
+            metadata = {}
+            if metadata_str:
+                metadata_str = metadata_str.rstrip(']').strip()
+
+                if ' ' in metadata_str:
+                    for mdata in metadata_str.split(' '):
+                        key, val = mdata.split('=', 2)
+                        metadata[key] = val
+
+                else:
+                    key, val = metadata_str.split('=', 2)
+                    metadata[key] = val
+
+            print()
+            print(
+                f" essential '{essential_list}'    +   metadata '{metadata}'")
+            
+            return (essential_list, metadata)
+        
+        elif data_type == "connection":
+            edge_one, edge_two = raw_str.split('-', 1)
+            if '-' in edge_two:
+                raise ValueError(
+                    "Connections must be declared in the format 'connection: <zone_1_name>-<zone_2_name>'")
+            print()
+            print(f"extracting edge --{edge_one}-- --{edge_two}--")
+            return (edge_one, edge_two)
+            pass
