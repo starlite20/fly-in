@@ -1,3 +1,6 @@
 from input_parser import read_file
 
-read_file("/home/suhail/Documents/github/fly-in/maps/easy/01_linear_path.txt")
+try:
+    read_file("testtext.txt")
+except Exception as e:
+    print(f"Error: {e}")
