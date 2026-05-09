@@ -19,7 +19,17 @@ Edges can have a cost.
 
 # class structure
 initially it needs :
-1. Zone class
+1. Zone class : type, is_start, is_end, is_hub, 
 2. Connection Class
 3. Graph Class
 4. Drone Class
+
+
+
+
+# input parser
+- validate file
+- read through lines.
+- split into lhs and rhs
+- validate the keys
+- validate rhs values

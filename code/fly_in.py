@@ -1,6 +1,8 @@
-from input_parser import read_file
+from input_parser import InputParser
 
 try:
-    read_file("testtext.txt")
+    inputconfig = InputParser("testtext.txt")
+    inputconfig.parse_file()
+    print(inputconfig)
 except Exception as e:
     print(f"Error: {e}")
