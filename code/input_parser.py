@@ -46,19 +46,19 @@ class InputParser():
                 f"Line {line_num} is in the wrong formatting with content '{line}'")
 
         if lhs == "nb_drones":
-            self._set_nb_drones(rhs)
+            self._set_nb_drones(rhs, line_num)
         elif lhs == "connection":
-            self._set_connection(rhs)
+            self._set_connection(rhs, line_num)
         elif lhs == "start_hub":
-            self._set_start_hub(rhs)
+            self._set_start_hub(rhs, line_num)
         elif lhs == "end_hub":
-            self._set_end_hub(rhs)
+            self._set_end_hub(rhs, line_num)
         elif lhs == "hub":
-            self._set_hub(rhs)
+            self._set_hub(rhs, line_num)
         else:
             raise ValueError(f"Invalid Key passed in Input -> '{lhs}'")
 
-    def _set_nb_drones(self, value: str) -> None:
+    def _set_nb_drones(self, value: str, line_num: int) -> None:
         if self._nb_drones != -1:
             raise ValueError(
                 f"Multiple Values passed for nb_drones -> '{value}'")
@@ -68,20 +68,20 @@ class InputParser():
             raise ValueError(
                 f"nb_drones must have an integer value. Value passed in -> '{value}'")
 
-    def _set_start_hub(self, value: str) -> None:
-        extracted_val = self._extract_components(value)
+    def _set_start_hub(self, value: str, line_num: int) -> None:
+        extracted_val = self._extract_components(value, line_num)
         self._start_hub_str.append(extracted_val)
 
-    def _set_end_hub(self, value: str) -> None:
-        extracted_val = self._extract_components(value)
+    def _set_end_hub(self, value: str, line_num: int) -> None:
+        extracted_val = self._extract_components(value, line_num)
         self._end_hub_str.append(extracted_val)
 
-    def _set_connection(self, value: str) -> None:
-        extracted_val = self._extract_components(value, "connection")
+    def _set_connection(self, value: str, line_num: int) -> None:
+        extracted_val = self._extract_components(value, line_num, "connection")
         self._all_connections_str.append(extracted_val)
 
-    def _set_hub(self, value: str) -> None:
-        extracted_val = self._extract_components(value)
+    def _set_hub(self, value: str, line_num: int) -> None:
+        extracted_val = self._extract_components(value, line_num)
         self._all_hubs_str.append(extracted_val)
 
     def _validate_mandatory(self):
@@ -98,7 +98,7 @@ class InputParser():
         elif len(self._end_hub_str) < 1:
             raise ValueError("Missing value for end zones.")
 
-    def _extract_components(self, raw_str: str, data_type: str = "zone"):
+    def _extract_components(self, raw_str: str, line_num: int, data_type: str = "zone"):
         # print(raw_str)
         # sample raw str
         # 'start 0 0 [color=green]'
@@ -116,13 +116,13 @@ class InputParser():
             essential = essential_str.split(' ')
             if len(essential) != 3:
                 raise ValueError(
-                    "Zones must be declared in the format '<hub_type>: <name> <x_coord> <y_coord> [<metadata_key>=<metadata_value> ...]'")
+                    f"At Line {line_num} => Zones must be declared in the format '<hub_type>: <name> <x_coord> <y_coord> [<metadata_key>=<metadata_value> ...]'")
             try:
                 x_coord = int(essential[1])
                 y_coord = int(essential[2])
             except ValueError:
                 raise ValueError(
-                    f"X,Y Coordinates must be a valid integer value. Invalid values provided : {essential[1]}, {essential[2]}")
+                    f"At Line {line_num} => X,Y Coordinates must be a valid integer value. Invalid values provided : {essential[1]}, {essential[2]}")
             essential_list = [essential[0], x_coord, y_coord]
 
             # process metadata part
@@ -131,13 +131,13 @@ class InputParser():
                 for mdata in metadata_str.split(' '):
                     if '=' not in mdata:
                         raise ValueError(
-                            "Metadata must be in format '[<key>=<value ...]'")
+                            f"At Line {line_num} => Metadata must be in format '[<key>=<value ...]'")
 
                     key, val = mdata.split('=', 2)
 
                     if key not in self._VALID_METADATA_KEYS:
                         raise ValueError(
-                            f"Invalid metadata key passed -> '{key}'")
+                            f"At Line {line_num} => Invalid metadata key passed -> '{key}'")
                     metadata[key] = val
 
             print()
@@ -150,8 +150,7 @@ class InputParser():
             edge_one, edge_two = raw_str.split('-', 1)
             if '-' in edge_two:
                 raise ValueError(
-                    "Connections must be declared in the format 'connection: <zone_1_name>-<zone_2_name>'")
+                    f"At Line {line_num} => Connections must be declared in the format 'connection: <zone_1_name>-<zone_2_name>'")
             print()
             print(f"extracting edge --{edge_one}-- --{edge_two}--")
             return (edge_one, edge_two)
-            pass
