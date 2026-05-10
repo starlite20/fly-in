@@ -146,9 +146,9 @@ class InputParser():
                 key, val = mdata.split('=', 2)
 
                 if key not in (self._VALID_ZONE_METADATA if data_type != "connection" else self._VALID_CONN_METADATA):
-                        raise ValueError(
-                            f"At Line {line_num} => Invalid metadata key passed -> '{key}'")
-                
+                    raise ValueError(
+                        f"At Line {line_num} => Invalid metadata key passed -> '{key}'")
+
                 metadata[key] = val
 
         print()
@@ -157,3 +157,24 @@ class InputParser():
 
         return (essential_list, metadata)
 
+    # read only params
+
+    @property
+    def nb_drones(self):
+        return self._nb_drones
+
+    @property
+    def start_hub_str(self):
+        return self._start_hub_str
+
+    @property
+    def end_hub_str(self):
+        return self._end_hub_str
+
+    @property
+    def all_hubs_str(self):
+        return self._all_hubs_str
+
+    @property
+    def all_connections_str(self):
+        return self._all_connections_str

@@ -24,12 +24,12 @@ class Zone():
 
         essential, zone_metadata = zone_data
 
-        self.hubname = essential[0]
+        self.zone_name = essential[0]
         self.zone_coordinate = (essential[1], essential[2])
         self.set_metadata(zone_metadata)
 
     def __str__(self):
-        str_val = f"{self.hubname.capitalize()} Zone '{self.hubname}'\n"
+        str_val = f"{self.zone_name.capitalize()} Zone '{self.zone_name}'\n"
         str_val += f"{self.role} at {self.zone_coordinate}\n"
         str_val += "Metadata\n"
         str_val += f"-- Color : {self.color}\n"
@@ -61,13 +61,3 @@ class Zone():
                     f"Invalid Value passed of Max Drones -> '{max_drones_str}'")
         else:
             self.max_drones = 1
-
-        # max_link_capacity metadata
-        # max_link_capacity_str = metadata.get("max_link_capacity")
-        # if max_link_capacity_str:
-        #     try:
-        #         self.max_link_capacity = int(max_link_capacity_str)
-        #     except ValueError:
-        #         raise ValueError(f"Invalid Value passed of Max Link Capacity -> '{max_drones_str}'")
-        # else:
-        #     self.max_link_capacity = 1

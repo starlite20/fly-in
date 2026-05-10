@@ -1,7 +1,10 @@
+from zones import Zone
+
+
 class Connection():
-    def __init__(self, zone_a_name: str, zone_b_name: str, max_link_capacity: int = 1):
-        self.zone_a_name = zone_a_name
-        self.zone_b_name = zone_b_name
+    def __init__(self, zone_a: Zone, zone_b: Zone, max_link_capacity: int = 1):
+        self.zone_a = zone_a
+        self.zone_b = zone_b
         self.max_link_capacity = max_link_capacity
 
     def __str__(self):

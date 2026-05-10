@@ -20,8 +20,12 @@ Edges can have a cost.
 # class structure
 initially it needs :
 1. Zone class : type, is_start, is_end, is_hub, 
+
 2. Connection Class
+
 3. Graph Class
+-- graph will deal with instantiating the zones, connections and linking them all together.
+
 4. Drone Class
 
 
