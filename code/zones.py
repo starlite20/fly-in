@@ -34,8 +34,6 @@ class Zone():
         str_val += "Metadata\n"
         str_val += f"-- Color : {self.color}\n"
         str_val += f"-- Max Drones : {self.max_drones}\n"
-        # str_val += f"-- Max Capacity Link : {self.max_link_capacity}\n"
-
         return str_val
 
     def set_metadata(self, metadata):

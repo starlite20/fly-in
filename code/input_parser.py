@@ -3,7 +3,8 @@ class InputParser():
     _MANDATORY_KEYS = ["nb_drones", "start_hub", "end_hub", "connection"]
     _OPTIONAL_KEYS = ["hub"]
     _ALL_KEYS = _MANDATORY_KEYS + _OPTIONAL_KEYS
-    _VALID_METADATA_KEYS = ["color", "zone", "max_drones", "max_link_capacity"]
+    _VALID_ZONE_METADATA = ["color", "zone", "max_drones"]
+    _VALID_CONN_METADATA = ["max_link_capacity"]
 
     def __init__(self, filename: str):
         self._filename = filename
@@ -102,16 +103,15 @@ class InputParser():
         # print(raw_str)
         # sample raw str
         # 'start 0 0 [color=green]'
+        # check if metadata given
+        if '[' in raw_str:
+            essential_str, metadata_str = raw_str.split(' [', 1)
+            metadata_str = metadata_str.rstrip(']').strip()
+        else:
+            essential_str = raw_str
+            metadata_str = ""
 
         if data_type == "zone":
-            # check if metadata given
-            if '[' in raw_str:
-                essential_str, metadata_str = raw_str.split(' [', 1)
-                metadata_str = metadata_str.rstrip(']').strip()
-            else:
-                essential_str = raw_str
-                metadata_str = ""
-
             # process essential values for zones
             essential = essential_str.split(' ')
             if len(essential) != 3:
@@ -125,32 +125,35 @@ class InputParser():
                     f"At Line {line_num} => X,Y Coordinates must be a valid integer value. Invalid values provided : {essential[1]}, {essential[2]}")
             essential_list = [essential[0], x_coord, y_coord]
 
-            # process metadata part
-            metadata = {}
-            if metadata_str:
-                for mdata in metadata_str.split(' '):
-                    if '=' not in mdata:
-                        raise ValueError(
-                            f"At Line {line_num} => Metadata must be in format '[<key>=<value ...]'")
-
-                    key, val = mdata.split('=', 2)
-
-                    if key not in self._VALID_METADATA_KEYS:
-                        raise ValueError(
-                            f"At Line {line_num} => Invalid metadata key passed -> '{key}'")
-                    metadata[key] = val
-
-            print()
-            print(
-                f" essential '{essential_list}'    +   metadata '{metadata}'")
-
-            return (essential_list, metadata)
-
         elif data_type == "connection":
-            edge_one, edge_two = raw_str.split('-', 1)
+            edge_one, edge_two = essential_str.split('-', 1)
             if '-' in edge_two:
                 raise ValueError(
                     f"At Line {line_num} => Connections must be declared in the format 'connection: <zone_1_name>-<zone_2_name>'")
             print()
             print(f"extracting edge --{edge_one}-- --{edge_two}--")
-            return (edge_one, edge_two)
+
+            essential_list = [edge_one, edge_two]
+
+        # process metadata part
+        metadata = {}
+        if metadata_str:
+            for mdata in metadata_str.split(' '):
+                if '=' not in mdata:
+                    raise ValueError(
+                        f"At Line {line_num} => Metadata must be in format '[<key>=<value ...]'")
+
+                key, val = mdata.split('=', 2)
+
+                if key not in (self._VALID_ZONE_METADATA if data_type != "connection" else self._VALID_CONN_METADATA):
+                        raise ValueError(
+                            f"At Line {line_num} => Invalid metadata key passed -> '{key}'")
+                
+                metadata[key] = val
+
+        print()
+        print(
+            f" essential '{essential_list}'    +   metadata '{metadata}'")
+
+        return (essential_list, metadata)
+
