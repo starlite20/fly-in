@@ -25,6 +25,8 @@ initially it needs :
 
 3. Graph Class
 -- graph will deal with instantiating the zones, connections and linking them all together.
+-- Adjacency List will be the way to represent the connections
+
 
 4. Drone Class
 
