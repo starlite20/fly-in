@@ -2,3 +2,6 @@
 __pycache__/
 *.pyc
 *.venv
+
+onefilemaker.py
+codebase_summary.txt

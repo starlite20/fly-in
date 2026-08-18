@@ -39,3 +39,27 @@ initially it needs :
 - split into lhs and rhs
 - validate the keys
 - validate rhs values
+
+
+
+
+# restarting project.
+
+## the plan
+- input parser
+- graph
+- route planner
+- allocator
+- scheduler
+- simulation
+- renderer
+
+## the classes for zones
+
+Domain Model architectural pattern ==> models
+
+ZoneType is an enum for setting values Directly about normal restricted priority unblocked. This is going to be in the input file and it will be in square brackets. So it's not a compulsory property, but it's an optional one.
+
+For the zone class, we could use the regular way of initializing the class using underscore underscore init underscore underscore as a function dedicated function to initialize how we want to configure and have all these, but it kind of makes it very rigid and we'll have to do the validation of the variables inside this particular class. So it kind of breaks the principle. So we are leaving the validation aspect to the parser file and keeping class as a pure data class. So it just stores the data and it has no functions within 
+
+
