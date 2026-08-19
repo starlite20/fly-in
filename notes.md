@@ -63,3 +63,42 @@ ZoneType is an enum for setting values Directly about normal restricted priority
 For the zone class, we could use the regular way of initializing the class using underscore underscore init underscore underscore as a function dedicated function to initialize how we want to configure and have all these, but it kind of makes it very rigid and we'll have to do the validation of the variables inside this particular class. So it kind of breaks the principle. So we are leaving the validation aspect to the parser file and keeping class as a pure data class. So it just stores the data and it has no functions within 
 
 
+
+
+## mastering regular expressions
+
+consider input line 
+hub: waypoint1 1 0 [color=blue]
+
+every line has the following format:
+- starts with hub / starthub / endhub
+- 1 colon
+- 1/more space
+- 1/more characters (alphabets, nums, underscore)
+- 1/more space
+- possible negative sign
+- 1/more digits
+- 1/more space
+- possible negative sign
+- 1/more digits
+- 0/more space
+- properties if available
+	- starts with [
+	- any characters (alphabets, nums, underscore)
+	- ends with ]
+
+we convert these rules to regex.
+^(start_hub|end_hub|hub):\s+(\w+)\s+(-?\d+)\s+(-?\d+)\s*(?:\[(.*)\])?$
+
+^
+(start_hub|end_hub|hub)
+:
+\s+
+(\w+)
+\s+
+(-?\d+)
+\s+
+(-?\d+)
+\s*
+
+(?:\[(.*)\])?$
